@@ -5,6 +5,11 @@
 
 {% block content %}
 <div class="row">
+    <div class="col-2">
+        <a type="button" class="btn btn-secondary" href="{% url 'blog:post_list' %}"><< All posts</a>
+    </div>
+</div>
+<div class="row mt-2">
     <div class="col-9">
         <h1>{{ post.title }}</h1>
 
@@ -41,7 +46,6 @@
             <div class="btn-group" role="group" aria-label="Basic mixed styles example">
               <a type="button" href="{% url 'blog:post_update' post.id %}" class="btn btn-primary">Edit</a>
               <a type="button" class="btn btn-danger">Delete</a>
-              <a type="button" class="btn btn-secondary">All posts</a>
             </div>
 
         </div>

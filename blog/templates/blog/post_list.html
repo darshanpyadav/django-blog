@@ -37,7 +37,7 @@
                 <td>{{ post.title }}</td>
                 <td>{{ post.body|slice:":50" }} {% if post.body|length >= 50 %} {{ "....." }} {% endif %}</td>
                 <td>{{ post.created_at }} {{tz}}</td>
-                <td><a href="{% url 'blog:post_detail' post.pk %}" class="btn btn-info btn-sm">View</a> <a href="#" class="btn btn-warning btn-sm">Edit</a></td>
+                <td><a href="{% url 'blog:post_detail' post.pk %}" class="btn btn-secondary btn-sm">View</a> <a href="#" class="btn btn-secondary btn-sm">Edit</a></td>
             </tr>
 
             {% endfor %}
