@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Post | {{post.title}}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-9">
+        <h1>{{ post.title }}</h1>
+
+        <p class="lead">{{ post.body | safe }}</p>
+
+        <hr>
+
+        <div class="tags">
+            {% for tag in post.tags.all %}
+            <span class="badge bg-light text-dark mb-2">#{{tag.name}}</span>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="col-3">
+        <div class="card card-body bg-light">
+            <dl class="dl-horizontal">
+                <label>Url:</label>
+                <p><a href="">URL</a></p>
+
+                <label>Category:</label>
+                {% for category in post.categories.all %}
+                <p><a href="" class="link-info">{{category.name}}</a></p>
+                {% endfor %}
+
+                <label>Created At:</label>
+                <p>{{ post.created_at }} {{tz}}</p>
+
+                <label>Last Updated:</label>
+                <p>{{ post.updated_at }} {{tz}}</p>
+            </dl>
+
+            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+              <a type="button" href="{% url 'blog:post_update' post.id %}" class="btn btn-primary">Edit</a>
+              <a type="button" class="btn btn-danger">Delete</a>
+              <a type="button" class="btn btn-secondary">All posts</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

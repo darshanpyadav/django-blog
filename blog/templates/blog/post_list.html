@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}All posts{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10">
+        <h2>All Posts</h2>
+    </div>
+
+    <div class="col-md-2">
+        <a href="{% url 'blog:post_create' %}" class="btn btn-block btn-primary btn-h1-spacing">Create New Post</a>
+    </div>
+    <div class="col-md-12">
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+                <th>#</th>
+                <th>Title</th>
+                <th>Body</th>
+                <th>Created At</th>
+                <th></th>
+            </thead>
+
+            <tbody>
+
+            {% for post in posts %}
+
+            <tr>
+                <th>{{ post.id }}</th>
+                <td>{{ post.title }}</td>
+                <td>{{ post.body|slice:":50" }} {% if post.body|length >= 50 %} {{ "....." }} {% endif %}</td>
+                <td>{{ post.created_at }} {{tz}}</td>
+                <td><a href="{% url 'blog:post_detail' post.pk %}" class="btn btn-info btn-sm">View</a> <a href="#" class="btn btn-warning btn-sm">Edit</a></td>
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+<!--        <div class="text-center">-->
+<!--            {!! $posts->links(); !!}-->
+<!--        </div>-->
+    </div>
+</div>
+{% endblock %}

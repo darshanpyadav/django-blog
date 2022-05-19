@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create a post{% endblock %}
+
+{% block content %}
+<div class="row">
+    <a href="{% url 'blog:post_list' %}" class="link-secondary">Go back to blog</a>
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <h1>Create a new Post</h1>
+            <form method="post" class="uniForm">
+                {% csrf_token %}
+                {{ form | crispy }}
+                <button class="btn btn-primary mb-4" type="submit">
+                    Update
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
