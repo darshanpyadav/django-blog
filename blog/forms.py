@@ -9,7 +9,6 @@ class PostModelForm(forms.ModelForm):
             'title',
             'post_length',
             'body',
-            'slug',
             'categories',
             'tags'
         )

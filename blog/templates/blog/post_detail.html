@@ -29,14 +29,16 @@
         <div class="card card-body bg-light">
             <dl class="dl-horizontal">
                 <label>Url:</label>
-                <p><a href="">URL</a></p>
+                <p><a href="">{{ post.slug }}</a></p>
 
                 <label>Category:</label>
                 {% for category in post.categories.all %}
-                <p><a href="" class="link-info">{{category.name}}</a></p>
+                <a href="#" class="link-info">{{category.name}}</a>
+                {% empty %}
+                <p>No categories assigned</p>
                 {% endfor %}
 
-                <label>Created At:</label>
+                <label class="mt-4">Created At:</label>
                 <p>{{ post.created_at }} {{tz}}</p>
 
                 <label>Last Updated:</label>
@@ -44,8 +46,8 @@
             </dl>
 
             <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-              <a type="button" href="{% url 'blog:post_update' post.id %}" class="btn btn-primary">Edit</a>
-              <a type="button" class="btn btn-danger">Delete</a>
+              <a type="button" href="{% url 'blog:post_update' post.slug %}" class="btn btn-primary">Edit</a>
+              <a type="button" href="{% url 'blog:post_delete' post.slug %}" class="btn btn-danger">Delete</a>
             </div>
 
         </div>

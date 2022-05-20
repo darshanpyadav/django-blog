@@ -1,6 +1,8 @@
+from django.urls import reverse
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth import get_user_model
+from autoslug import AutoSlugField
 
 
 User = get_user_model()
@@ -23,7 +25,10 @@ class Post(models.Model):
     body = models.TextField(help_text='Enter post text here')
     # blank will check if input is an empty string
     # can be null
-    slug = models.CharField(max_length=50, unique=True, blank=False)
+    # Make slug as index
+    # slug = models.CharField(max_length=50, unique=True, blank=False, db_index=True)
+    # slug = models.SlugField(max_length=50, unique=True, blank=False, db_index=True)
+    slug = AutoSlugField(populate_from='title', unique=True, editable=True)
     # many-many relationships are generally defined in model where it is edited
     # default accessed as post_set, Overridden by posts
     # If model is defined later, add '' for name
@@ -35,6 +40,9 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("blog:post_detail", kwargs={"slug": self.slug})
 
     # can also write methods to override existing model.Model methods
 

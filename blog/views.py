@@ -1,7 +1,7 @@
 import datetime
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import PostModelForm
 from .models import Post
@@ -12,6 +12,25 @@ from django.conf import settings
 def index_view(request):
     # return HttpResponse("Hello World!")
     return render(request, "blog/index.html", context={})
+
+
+class BlogListView(generic.ListView):
+    template_name = "blog/index.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        return Post.objects.order_by("-created_at")[:5]
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        # main_post is the one with most comments in all posts
+        # 2 sub posts are the second and third highest
+        context_data.update(
+            {
+                "main_post": Post.objects.first,
+                "sub_posts": Post.objects.order_by("-created_at")[:2]
+             })
+        return context_data
 
 
 def contact_view(request):
@@ -62,6 +81,30 @@ def post_create(request):
 #         return self.success_message.format(**cleaned_data)
 
 # Phase 3 changing redirect url to show post
+# class PostCreateView(SuccessMessageMixin, generic.CreateView):
+#     form_class = PostModelForm
+#     # default is "blog/post_form.html"
+#     template_name = "blog/post_create.html"
+#     # can define below param instead of get_success_url
+#     success_message = "Post with title '{title}' was created successfully"
+#
+#     def get_success_url(self):
+#         return reverse('blog:post_detail', args=(self.object.id,))
+#
+#     def get_success_message(self, cleaned_data):
+#         return self.success_message.format(**cleaned_data)
+#
+#
+# def post_detail(request, pk):
+#     post = Post.objects.get(pk=pk)
+#     context = {
+#         "post": post,
+#         "tz": settings.TIME_ZONE
+#     }
+#     return render(request, "blog/post_detail.html", context=context)
+
+
+# Phase 4 using slug
 class PostCreateView(SuccessMessageMixin, generic.CreateView):
     form_class = PostModelForm
     # default is "blog/post_form.html"
@@ -70,7 +113,7 @@ class PostCreateView(SuccessMessageMixin, generic.CreateView):
     success_message = "Post with title '{title}' was created successfully"
 
     def get_success_url(self):
-        return reverse('blog:post_detail', args=(self.object.id,))
+        return reverse('blog:post_detail', kwargs={"slug": self.object.slug})
 
     def get_success_message(self, cleaned_data):
         return self.success_message.format(**cleaned_data)
@@ -86,6 +129,7 @@ def post_detail(request, pk):
 
 
 # Phase 1
+# Phase 2 after adding slug no modification was needed
 class PostDetailView(generic.DetailView):
     model = Post
     # template_name = "blog/post_detail.html" # -> by default
@@ -108,7 +152,7 @@ def post_list(request):
 
 class PostListView(generic.ListView):
     model = Post
-    # paginate_by = 10
+    paginate_by = 5
     context_object_name = "posts"
     # template_name = "blog/post_list.html"
     ordering = ['-created_at']
@@ -137,6 +181,7 @@ def post_update(request, pk):
     return render(request, "blog/post_update.html", context=context)
 
 
+# No changes were needed after adding slug, other than reverse url
 class PostUpdateView(SuccessMessageMixin, generic.UpdateView):
     model = Post
     form_class = PostModelForm
@@ -146,7 +191,8 @@ class PostUpdateView(SuccessMessageMixin, generic.UpdateView):
     success_message = "Post with title '{title}' was updated successfully"
 
     def get_success_url(self):
-        return reverse('blog:post_detail', args=(self.object.id,))
+        # return reverse('blog:post_detail', args=(self.object.id,))
+        return reverse('blog:post_detail', kwargs={"slug": self.object.slug})
 
     def get_success_message(self, cleaned_data):
         return self.success_message.format(**cleaned_data)
@@ -165,3 +211,20 @@ def post_delete(request, pk):
     post.delete()
     messages.add_message(request, messages.ERROR, 'Post deletion successful!')
     return redirect('blog:post_list')
+
+
+# Phase 1
+# class PostDeleteView(generic.DeleteView):
+#     model = Post
+#     success_url = reverse_lazy('blog:post_list')
+#     # reverse_lazy should be used if we define attribute
+#     # reverse should be used within get_success_utl method
+
+
+# Phase 2, add message. Slug works without changes
+class PostDeleteView(generic.DeleteView):
+    model = Post
+
+    def get_success_url(self):
+        messages.error(self.request, "Deleted the post successfully!")
+        return reverse("blog:post_list")
