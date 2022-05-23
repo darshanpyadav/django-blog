@@ -10,18 +10,22 @@
             <a class="link-secondary" href="#" aria-label="Search">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
             </a>
+            {% if request.user.is_authenticated %}
             <ul class="nav nav-pills">
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Hello </a>
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{ request.user.username }}</a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="#">Posts</a></li>
                   <li><a class="dropdown-item" href="#">Categories</a></li>
                   <li><a class="dropdown-item" href="#">Tags</a></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="#">Logout</a></li>
+                  <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
                 </ul>
               </li>
             </ul>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-default">Login</a>
+            {% endif %}
           </div>
         </div>
       </header>

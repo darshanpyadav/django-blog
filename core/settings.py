@@ -41,6 +41,8 @@ INSTALLED_APPS = [
 
     #user defined apps
     'blog',
+    'category',
+    'tag',
 
     # third party apps
     'crispy_forms',

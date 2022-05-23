@@ -24,6 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('contact', contact_view, name='contact'),
     path('', include('blog.urls', namespace='blog')),
+    path('categories/', include('category.urls', namespace='category')),
+    path('tags/', include('tag.urls', namespace='tag')),
 
     # sign up view isn't there because we need to enter what details have to be passed in signup
     path('signup/', SignupView.as_view(), name='signup'),

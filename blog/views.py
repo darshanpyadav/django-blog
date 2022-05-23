@@ -236,6 +236,9 @@ def post_delete(request, pk):
 
 # Phase 2, add message. Slug works without changes
 class PostDeleteView(generic.DeleteView):
+    """
+    DeleteView responds to POST and GET requests, GET request display confirmation template, while POST deletes instance.
+    """
     model = Post
 
     def get_success_url(self):
