@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-6">
+
+        <div class="py-2 border-b border-gray-200">
+            <a class="hover:text-blue-500" href="{% url 'signup' %}">Don't have an account?</a>
+        </div>
+
+        <form method="post" class="mt-3">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type='submit' class="btn btn-primary">
+                Login
+            </button>
+        </form>
+        <div class="py-2 border-t border-gray-200 mt-3">
+            <a class="hover:text-blue-500" href="{% url 'reset-password' %}">Forgot password?</a>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

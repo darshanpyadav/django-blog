@@ -10,7 +10,18 @@
             <a class="link-secondary" href="#" aria-label="Search">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
             </a>
-            <a class="btn btn-sm btn-outline-secondary" href="#">Sign up</a>
+            <ul class="nav nav-pills">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Hello </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Posts</a></li>
+                  <li><a class="dropdown-item" href="#">Categories</a></li>
+                  <li><a class="dropdown-item" href="#">Tags</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#">Logout</a></li>
+                </ul>
+              </li>
+            </ul>
           </div>
         </div>
       </header>
@@ -21,13 +32,5 @@
             <a class="p-2 link-secondary" href="#">{{category}}</a>
         {% endfor %}
         </nav>
-<!--        <nav class="nav d-flex justify-content-between">-->
-<!--          <a class="p-2 link-secondary" href="#">World</a>-->
-<!--          <a class="p-2 link-secondary" href="#">U.S.</a>-->
-<!--          <a class="p-2 link-secondary" href="#">Technology</a>-->
-<!--          <a class="p-2 link-secondary" href="#">Design</a>-->
-<!--          <a class="p-2 link-secondary" href="#">Culture</a>-->
-<!--          <a class="p-2 link-secondary" href="#">Business</a>-->
-<!--        </nav>-->
       </div>
 </div>

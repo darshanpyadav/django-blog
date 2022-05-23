@@ -29,7 +29,7 @@
         <div class="card card-body bg-light">
             <dl class="dl-horizontal">
                 <label>Url:</label>
-                <p><a href="">{{ post.slug }}</a></p>
+                <p><a href="{% url 'blog:blog_detail' post.slug %}">{{ post.slug }}</a></p>
 
                 <label>Category:</label>
                 {% for category in post.categories.all %}

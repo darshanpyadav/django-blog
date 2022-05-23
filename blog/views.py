@@ -3,10 +3,18 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import PostModelForm
+from .forms import PostModelForm, CustomUserCreationForm
 from .models import Post
 from django.views import generic
 from django.conf import settings
+
+
+class SignupView(generic.CreateView):
+    template_name = "registration/signup.html"
+    form_class = CustomUserCreationForm
+
+    def get_success_url(self):
+        return reverse("login")
 
 
 def index_view(request):
@@ -31,6 +39,11 @@ class BlogListView(generic.ListView):
                 "sub_posts": Post.objects.order_by("-created_at")[:2]
              })
         return context_data
+
+
+class BlogDetailView(generic.DetailView):
+    model = Post
+    template_name = "blog/blog_single.html"
 
 
 def contact_view(request):
