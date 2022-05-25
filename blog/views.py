@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import PostModelForm, CustomUserCreationForm, CommentModelForm
+from .forms import PostModelForm, CustomUserCreationForm, CommentModelForm, UserUpdateForm, ProfileUpdateForm
 from .models import Post, Comment
 from django.views import generic
 from django.conf import settings
@@ -42,7 +42,7 @@ class BlogListView(generic.ListView):
             {
                 "main_post": Post.objects.first,
                 "sub_posts": Post.objects.order_by("-created_at")[:2]
-             })
+            })
         return context_data
 
 
@@ -199,6 +199,7 @@ def post_detail(request, pk):
 # Phase 4 allow detail view only for creators
 class PostDetailView(LoginRequiredMixin, generic.DetailView):
     model = Post
+
     # template_name = "blog/post_detail.html" # -> by default
     # context_object_name = "post"  # ->by default
 
@@ -359,3 +360,28 @@ def comment_approve(request, pk):
         comment.save()
         messages.success(request, "Comment approved")
         return redirect("blog:post_detail", slug=comment.post.slug)
+
+
+@login_required
+def profile_view(request):
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST,
+                                   request.FILES,
+                                   instance=request.user.userprofile)
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, f'Your account has been updated!')
+            return redirect('profile')  # Redirect back to profile page
+
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=request.user.userprofile)
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form
+    }
+
+    return render(request, 'user_profile.html', context)

@@ -3,10 +3,40 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth import get_user_model
 from autoslug import AutoSlugField
-from tinymce import models as tinymce_models
+from django.db.models.signals import post_save
+from PIL import Image
 
 
 User = get_user_model()
+
+
+class UserProfile(models.Model):
+    # https://www.devhandbook.com/django/user-profile/
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(default='default.jpg', upload_to='profile_pics')
+
+    def __str__(self):
+        return f'{self.user.username} Profile'
+
+    # Override the save method of the model
+    def save(self):
+        super().save()
+
+        img = Image.open(self.avatar.path)  # Open image
+
+        # resize image
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)  # Resize image
+            img.save(self.avatar.path)  # Save it again and override the larger image
+
+
+def post_user_created_signal(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+
+post_save.connect(post_user_created_signal, sender=User)
 
 
 # creates table with name 'blog_post'
@@ -23,7 +53,7 @@ class Post(models.Model):
     post_length = models.CharField(max_length=1, choices=POST_LENGTHS)
     # help_text is for 'help' field in forms
     title = models.CharField(max_length=50)
-    body = tinymce_models.HTMLField()
+    body = models.TextField()
     # blank will check if input is an empty string
     # can be null
     # Make slug as index

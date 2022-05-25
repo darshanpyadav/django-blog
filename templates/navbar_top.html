@@ -15,6 +15,8 @@
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{ request.user.username }}</a>
                 <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                  <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="{% url 'blog:post_list' %}">Posts</a></li>
                   <li><a class="dropdown-item" href="{% url 'category:category_list' %}">Categories</a></li>
                   <li><a class="dropdown-item" href="{% url 'tag:tag_list' %}">Tags</a></li>

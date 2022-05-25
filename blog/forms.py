@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
 from django.core.exceptions import ValidationError
 
-from .models import Post, Category, Tag, Comment
+from .models import Post, Category, Tag, Comment, UserProfile
 from django import forms
 
 
@@ -50,6 +50,22 @@ class CustomUserCreationForm(UserCreationForm):
         if User.objects.filter(email=email).exists():
             raise ValidationError("An user with this email already exists!")
         return email
+
+
+# Create a ProfileUpdateForm to update image
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['avatar']
+
+
+# Create a UserUpdateForm to update username and email
+class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = User
+        fields = ['email']
 
 
 class CommentModelForm(forms.ModelForm):

@@ -17,7 +17,9 @@ from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, \
     PasswordResetConfirmView, PasswordResetCompleteView
 from django.urls import path, include
-from blog.views import contact_view, SignupView
+from blog.views import contact_view, SignupView, profile_view
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -25,6 +27,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('contact', contact_view, name='contact'),
+    path('profile/', profile_view, name='profile'),
     path('', include('blog.urls', namespace='blog')),
     path('categories/', include('category.urls', namespace='category')),
     path('tags/', include('tag.urls', namespace='tag')),
@@ -39,3 +42,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
 ]
+
+# Only add this when we in debug mode
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
