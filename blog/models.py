@@ -135,8 +135,8 @@ class Comment(models.Model):
     # on_delete can be CASCADE, PROTECT, RESTRICT
     # If post is deleted, delete all it's comments
     # Restrict restricts deletion of parent
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    text = models.TextField(help_text='Enter post text here')
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
+    text = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     approved = models.BooleanField(default=False)
     commented_at = models.DateTimeField(auto_now_add=True)

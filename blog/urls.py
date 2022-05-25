@@ -23,5 +23,8 @@ urlpatterns = [
 
     # path('posts/<int:pk>/delete', views.post_delete, name='post_delete'),
     # path('posts/<int:pk>/delete', views.PostDeleteView.as_view(), name='post_delete'),
-    path('posts/<slug:slug>/delete', views.PostDeleteView.as_view(), name='post_delete')
+    path('posts/<slug:slug>/delete', views.PostDeleteView.as_view(), name='post_delete'),
+
+    path('comments/<int:pk>/delete', views.CommentDeleteView.as_view(), name='comment_delete'),
+    path('comments/<int:pk>/approve', views.comment_approve, name='comment_approve')
 ]

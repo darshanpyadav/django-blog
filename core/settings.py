@@ -46,7 +46,8 @@ INSTALLED_APPS = [
 
     # third party apps
     'crispy_forms',
-    'crispy_bootstrap5'
+    'crispy_bootstrap5',
+    'django_icons'
 ]
 
 MIDDLEWARE = [
@@ -155,3 +156,11 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DJANGO_ICONS = {
+    "ICONS": {
+        "edit": {"name": "fa fa-pencil"},
+        "delete": {"name": "fa fa-trash"},
+        "approve": {"name": "fa fa-thumbs-o-up"}
+    },
+}

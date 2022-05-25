@@ -1,12 +1,14 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views import generic
 from blog.models import Tag
 from .forms import TagModelForm
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class TagListView(generic.ListView):
+class TagListView(LoginRequiredMixin, generic.ListView):
     model = Tag
     template_name = "tag/tag_list.html"
     context_object_name = "tags"
@@ -21,6 +23,7 @@ class TagListView(generic.ListView):
         return context_data
 
 
+@login_required(login_url="/login/")
 def tag_create(request):
     if request.method == "POST":
         # pass the request to the form to validate
@@ -34,17 +37,17 @@ def tag_create(request):
             return redirect("tag:tag_list")
 
 
-class TagDetailView(generic.DetailView):
+class TagDetailView(LoginRequiredMixin, generic.DetailView):
     model = Tag
     template_name = "tag/tag_detail.html"
 
 
-class TagUpdateView(generic.UpdateView):
+class TagUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Tag
     template_name = "tag/tag_update.html"
 
 
-class TagDelete(generic.DeleteView):
+class TagDelete(LoginRequiredMixin, generic.DeleteView):
     model = Tag
 
     def get_success_url(self):

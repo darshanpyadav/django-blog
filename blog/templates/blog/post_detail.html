@@ -1,7 +1,16 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load icons %}
 
 {% block title %}Post | {{post.title}}{% endblock %}
+
+{% block extrastyle %}
+<!-- Font Awesome CSS -->
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous">
+{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -23,6 +32,44 @@
             {% endfor %}
         </div>
 
+        <div id="backend-comments" style="margin-top: 50px;">
+            <h3>Comments <small>{{ post.comments.count }} total</small></h3>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Comment</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for comment in post.comments.all %}
+                    <tr>
+                        <td>{{ comment.user.username }}</td>
+                        <td>{{ comment.user.email }}</td>
+                        <td>{{ comment.text }}</td>
+                        <td class="justify-content-end">
+                            <form method="POST" action="{% url 'blog:comment_delete' comment.id %}">
+                               {% csrf_token %}
+                                <button type="submit" class="btn btn-xs btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">{% icon 'delete' %}</button>
+                            </form>
+                            {% if not comment.approved %}
+                            <form method="POST" action="{% url 'blog:comment_approve' comment.id %}">
+                               {% csrf_token %}
+                                <button type="submit" class="btn btn-xs btn-success mt-1" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Approve">{% icon 'approve' %}</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
     </div>
 
     <div class="col-3">
@@ -33,12 +80,12 @@
 
                 <label>Category:</label>
                 {% for category in post.categories.all %}
-                <a href="#" class="link-info">{{category.name}}</a>
+                <p><a href="#" class="link-info">{{category.name}}</a></p>
                 {% empty %}
                 <p>No categories assigned</p>
                 {% endfor %}
 
-                <label class="mt-4">Created At:</label>
+                <label>Created At:</label>
                 <p>{{ post.created_at }} {{tz}}</p>
 
                 <label>Last Updated:</label>
@@ -54,4 +101,13 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
 {% endblock %}

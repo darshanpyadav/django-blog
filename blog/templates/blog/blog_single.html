@@ -5,20 +5,93 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-8">
         <h1>{{ post.title }}</h1>
         <p>{{ post.body| safe }}</p>
-        <hr>
         <div class="tags">
+            Tags:
             {% for tag in post.tags.all %}
             <span class="badge bg-light text-dark mb-2">#{{tag.name}}</span>
             {% endfor %}
         </div>
-        {% for category in first_post.categories.all %}
+        Categories:
+        {% for category in post.categories.all %}
         <strong class="d-inline-block mb-2 text-primary">
-          {{category}}
+            {{category}}
         </strong>
         {% endfor %}
+        <hr>
+        <section>
+            <div class="container my-2 py-2">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-12 col-lg-10">
+                        <div class="card text-dark">
+                            <h4 class="m-1">Recent comments</h4>
+                            <p class="fw-light m-1">Latest Comments section by users</p>
+                            {% for comment in post.comments|approved_comments %}
+                            <div class="card-body p-4">
+                                <div class="d-flex flex-start">
+                                    <img class="rounded-circle shadow-1-strong me-3"
+                                         src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp" alt="avatar" width="60"
+                                         height="60" />
+                                    <div>
+                                        <h6 class="fw-bold mb-1">{{comment.user.first_name}} {{comment.user.last_name}}</h6>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <p class="mb-0">
+                                                {{ comment.commented_at | date:"M d" }}
+<!--                                                <span class="badge bg-primary">Pending</span>-->
+                                            </p>
+                                        </div>
+                                        <p class="mb-0">
+                                            {{ comment.text | safe }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-0" />
+                            {% empty %}
+                            <p class="fw-light m-2 p-2">No comments</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container my-2 py-2">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-12 col-lg-10">
+                        <form method="post" class="uniForm">
+                            {% csrf_token %}
+                            <div class="form-outline w-100">
+                                {{ comment_form.text.errors }}
+                                {{ comment_form.text }}
+                            </div>
+                            <button class="btn btn-success mt-2 mb-4" type="submit">
+                                Post Comment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 {% endblock %}
+
+            <div class="container my-2 py-2">
+                <div class="card-footer border-0" style="background-color: #f8f9fa;">
+                <div class="d-flex flex-start w-100">
+                  <img class="rounded-circle shadow-1-strong me-3"
+                    src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(19).webp" alt="avatar" width="40"
+                    height="40" />
+                  <div class="form-outline w-100">
+                    <textarea class="form-control" id="textAreaExample" rows="4"
+                      style="background: #fff;"></textarea>
+                  </div>
+                </div>
+                <div class="float-end mt-2 pt-1">
+                  <button type="button" class="btn btn-primary btn-sm">Post comment</button>
+                </div>
+            </div>
+            </div>

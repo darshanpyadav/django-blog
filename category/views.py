@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.views import generic
 from blog.models import Category
@@ -6,7 +8,7 @@ from django.urls import reverse
 from django.contrib import messages
 
 
-class CategoryListView(generic.ListView):
+class CategoryListView(LoginRequiredMixin, generic.ListView):
     model = Category
     template_name = "category/category_list.html"
     context_object_name = "categories"
@@ -21,6 +23,7 @@ class CategoryListView(generic.ListView):
         return context_data
 
 
+@login_required(login_url="/login/")
 def category_create(request):
     if request.method == "POST":
         # pass the request to the form to validate
@@ -34,7 +37,7 @@ def category_create(request):
             return redirect("category:category_list")
 
 
-class CategoryDelete(generic.DeleteView):
+class CategoryDelete(LoginRequiredMixin, generic.DeleteView):
     model = Category
 
     def get_success_url(self):

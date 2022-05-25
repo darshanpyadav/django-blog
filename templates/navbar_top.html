@@ -15,9 +15,9 @@
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{ request.user.username }}</a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Posts</a></li>
-                  <li><a class="dropdown-item" href="#">Categories</a></li>
-                  <li><a class="dropdown-item" href="#">Tags</a></li>
+                  <li><a class="dropdown-item" href="{% url 'blog:post_list' %}">Posts</a></li>
+                  <li><a class="dropdown-item" href="{% url 'category:category_list' %}">Categories</a></li>
+                  <li><a class="dropdown-item" href="{% url 'tag:tag_list' %}">Tags</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
                 </ul>
@@ -30,6 +30,7 @@
         </div>
       </header>
 
+    {% if request.user.is_authenticated %}
     <div class="nav-scroller py-1 mb-2">
         <nav class="nav d-flex justify-content-between">
         {% for category in categories %}
@@ -37,4 +38,5 @@
         {% endfor %}
         </nav>
       </div>
+    {% endif %}
 </div>

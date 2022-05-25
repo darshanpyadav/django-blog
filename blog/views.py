@@ -3,10 +3,13 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import PostModelForm, CustomUserCreationForm
-from .models import Post
+from .forms import PostModelForm, CustomUserCreationForm, CommentModelForm
+from .models import Post, Comment
 from django.views import generic
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.template.defaulttags import register
 
 
 class SignupView(generic.CreateView):
@@ -44,6 +47,33 @@ class BlogListView(generic.ListView):
 class BlogDetailView(generic.DetailView):
     model = Post
     template_name = "blog/blog_single.html"
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data.update(
+            {
+                "comment_form": CommentModelForm
+            })
+        return context_data
+
+    def post(self, request, *args, **kwargs):
+        form = CommentModelForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = self.get_object()
+            comment.user = request.user
+            comment.save()
+            messages.warning(request, "Your comment has gone for approval to the post publisher. "
+                                      "It'll be visible once approved!")
+            return redirect("blog:blog_detail", slug=self.get_object().slug)
+        else:
+            messages.error(request, f'{form.errors}')
+            return redirect("blog:blog_list")
+
+    @staticmethod
+    @register.filter
+    def approved_comments(post_comments):
+        return post_comments.filter(approved=True)
 
 
 def contact_view(request):
@@ -117,8 +147,8 @@ def post_create(request):
 #     return render(request, "blog/post_detail.html", context=context)
 
 
-# Phase 4 using slug
-class PostCreateView(SuccessMessageMixin, generic.CreateView):
+# Phase 4 using slug, add Login
+class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.CreateView):
     form_class = PostModelForm
     # default is "blog/post_form.html"
     template_name = "blog/post_create.html"
@@ -143,7 +173,8 @@ def post_detail(request, pk):
 
 # Phase 1
 # Phase 2 after adding slug no modification was needed
-class PostDetailView(generic.DetailView):
+# Phase 3 Login
+class PostDetailView(LoginRequiredMixin, generic.DetailView):
     model = Post
     # template_name = "blog/post_detail.html" # -> by default
     # context_object_name = "post"  # ->by default
@@ -163,7 +194,7 @@ def post_list(request):
     return render(request, "blog/post_list.html", context=context)
 
 
-class PostListView(generic.ListView):
+class PostListView(LoginRequiredMixin, generic.ListView):
     model = Post
     paginate_by = 5
     context_object_name = "posts"
@@ -195,7 +226,7 @@ def post_update(request, pk):
 
 
 # No changes were needed after adding slug, other than reverse url
-class PostUpdateView(SuccessMessageMixin, generic.UpdateView):
+class PostUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateView):
     model = Post
     form_class = PostModelForm
     # default is "blog/post_form.html"
@@ -235,7 +266,8 @@ def post_delete(request, pk):
 
 
 # Phase 2, add message. Slug works without changes
-class PostDeleteView(generic.DeleteView):
+# Phase 3 login
+class PostDeleteView(LoginRequiredMixin, generic.DeleteView):
     """
     DeleteView responds to POST and GET requests, GET request display confirmation template, while POST deletes instance.
     """
@@ -244,3 +276,22 @@ class PostDeleteView(generic.DeleteView):
     def get_success_url(self):
         messages.error(self.request, "Deleted the post successfully!")
         return reverse("blog:post_list")
+
+
+class CommentDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Comment
+
+    def get_success_url(self):
+        messages.error(self.request, "Comment deleted successfully!")
+        return reverse("blog:post_detail", kwargs={'slug': self.object.post.slug})
+
+
+@login_required(login_url="/login/")
+def comment_approve(request, pk):
+    if request.method == "POST":
+        # pass the request to the form to validate
+        comment = Comment.objects.get(pk=pk)
+        comment.approved = True
+        comment.save()
+        messages.success(request, "Comment approved")
+        return redirect("blog:post_detail", slug=comment.post.slug)
