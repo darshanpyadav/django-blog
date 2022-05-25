@@ -13,47 +13,6 @@
 </div>
 {% endif %}
 
-{% if sub_posts|length >= 2 %}
-<div class="row mb-2">
-  <div class="col-md-6">
-    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-      {% with first_post=sub_posts.0 %}
-      <div class="col p-4 d-flex flex-column position-static">
-        <strong class="d-inline-block mb-2 text-primary">
-          {% for category in first_post.categories.all %}{{category}} {% endfor %}
-        </strong>
-        <h3 class="mb-0">{{ first_post.title }}</h3>
-        <div class="mb-1 text-muted">{{ first_post.created_at | date:"M d" }}</div>
-        <p class="card-text mb-auto">{{ first_post.body|striptags|slice:":50" }} {% if first_post.body|striptags|length >= 50 %} {{ "..." }} {% endif %}</p>
-        <a href="{% url 'blog:blog_detail' first_post.slug %}" class="stretched-link">Continue reading</a>
-      </div>
-      <div class="col-auto d-none d-lg-block">
-        <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
-      </div>
-      {% endwith %}
-    </div>
-  </div>
-  <div class="col-md-6">
-    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-      {% with second_post=sub_posts.1 %}
-      <div class="col p-4 d-flex flex-column position-static">
-        <strong class="d-inline-block mb-2 text-primary">
-          {% for category in second_post.categories.all %}{{category}} {% endfor %}
-        </strong>
-        <h3 class="mb-0">{{ second_post.title }}</h3>
-        <div class="mb-1 text-muted">{{ second_post.created_at | date:"M d" }}</div>
-        <p class="card-text mb-auto">{{ second_post.body|striptags|slice:":50" }} {% if second_post.body|striptags|length >= 50 %} {{ "..." }} {% endif %}</p>
-        <a href="{% url 'blog:blog_detail' second_post.slug %}" class="stretched-link">Continue reading</a>
-      </div>
-      <div class="col-auto d-none d-lg-block">
-        <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
-      </div>
-      {% endwith %}
-    </div>
-  </div>
-</div>
-{% endif %}
-
 <div class="row g-5">
   <div class="col-md-8">
     <h3 class="pb-4 mb-4 fst-italic border-bottom">

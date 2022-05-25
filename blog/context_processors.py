@@ -1,7 +1,7 @@
-from .models import Category
+from .models import Tag
 
 
 def categories(request):
     return {
-        'categories': Category.objects.order_by('id')
+        'tags': Tag.objects.order_by('id')
     }

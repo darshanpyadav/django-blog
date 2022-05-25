@@ -49,8 +49,7 @@ class BlogListView(generic.ListView):
         # 2 sub posts are the second and third highest
         context_data.update(
             {
-                "main_post": main_post,
-                "sub_posts": Post.objects.order_by("-created_at")[:2]
+                "main_post": main_post
             })
         return context_data
 
