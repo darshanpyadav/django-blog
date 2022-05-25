@@ -6,7 +6,7 @@
 {% block content %}
 <div class="row">
     <div class="col-md-10">
-        <h2>All Posts</h2>
+        <h2>My Posts</h2>
     </div>
 
     <div class="col-md-2">
@@ -35,9 +35,12 @@
             <tr>
                 <th>{{ post.id }}</th>
                 <td>{{ post.title }}</td>
-                <td>{{ post.body|slice:":50" }} {% if post.body|length >= 50 %} {{ "....." }} {% endif %}</td>
+                <td>{{ post.body|striptags|slice:":50" }} {% if post.body|striptags|length >= 50 %} {{ "....." }} {% endif %}</td>
                 <td>{{ post.created_at }} {{tz}}</td>
-                <td><a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-secondary btn-sm">View</a> <a href="{% url 'blog:post_update' post.id %}" class="btn btn-secondary btn-sm">Edit</a></td>
+                <td><a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-secondary btn-sm">View</a>
+                    <a href="{% url 'blog:post_update' post.slug %}" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="{% url 'blog:post_delete' post.slug %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
             </tr>
 
             {% endfor %}

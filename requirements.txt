@@ -1,3 +1,4 @@
 django-autoslug==1.9.8
 django-crispy-forms
 django-icons
+django-tinymce

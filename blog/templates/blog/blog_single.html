@@ -1,7 +1,16 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load icons %}
 
 {% block title %}Blog | {{post.title}}{% endblock %}
+
+{% block extrastyle %}
+<!-- Font Awesome CSS -->
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous">
+{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -45,6 +54,12 @@
                                         <p class="mb-0">
                                             {{ comment.text | safe }}
                                         </p>
+                                        {% if request.user == comment.user %}
+                                        <form method="POST" action="{% url 'blog:comment_delete' comment.id %}?redirect=blog">
+                                           {% csrf_token %}
+                                            <button type="submit" class="mt-1 btn btn-xs btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">{% icon 'delete' %}</button>
+                                        </form>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -77,6 +92,15 @@
         </section>
     </div>
 </div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
 {% endblock %}
 
             <div class="container my-2 py-2">

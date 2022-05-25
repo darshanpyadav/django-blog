@@ -1,5 +1,7 @@
 import datetime
-from django.shortcuts import render, redirect
+
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
@@ -148,6 +150,20 @@ def post_create(request):
 
 
 # Phase 4 using slug, add Login
+# class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.CreateView):
+#     form_class = PostModelForm
+#     # default is "blog/post_form.html"
+#     template_name = "blog/post_create.html"
+#     # can define below param instead of get_success_url
+#     success_message = "Post with title '{title}' was created successfully"
+#
+#     def get_success_url(self):
+#         return reverse('blog:post_detail', kwargs={"slug": self.object.slug})
+#
+#     def get_success_message(self, cleaned_data):
+#         return self.success_message.format(**cleaned_data)
+
+# Phase 5 adding user
 class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.CreateView):
     form_class = PostModelForm
     # default is "blog/post_form.html"
@@ -160,6 +176,12 @@ class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, generic.CreateView
 
     def get_success_message(self, cleaned_data):
         return self.success_message.format(**cleaned_data)
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.user = self.request.user
+        post.save()
+        return super(PostCreateView, self).form_valid(form)
 
 
 def post_detail(request, pk):
@@ -174,6 +196,7 @@ def post_detail(request, pk):
 # Phase 1
 # Phase 2 after adding slug no modification was needed
 # Phase 3 Login
+# Phase 4 allow detail view only for creators
 class PostDetailView(LoginRequiredMixin, generic.DetailView):
     model = Post
     # template_name = "blog/post_detail.html" # -> by default
@@ -183,6 +206,9 @@ class PostDetailView(LoginRequiredMixin, generic.DetailView):
         context_data = super().get_context_data(**kwargs)
         context_data.update({"tz": settings.TIME_ZONE})
         return context_data
+
+    def get_queryset(self):
+        return Post.objects.filter(slug=self.kwargs["slug"], user=self.request.user)
 
 
 def post_list(request):
@@ -194,12 +220,26 @@ def post_list(request):
     return render(request, "blog/post_list.html", context=context)
 
 
+# class PostListView(LoginRequiredMixin, generic.ListView):
+#     model = Post
+#     paginate_by = 5
+#     context_object_name = "posts"
+#     # template_name = "blog/post_list.html"
+#     ordering = ['-created_at']
+
+
+# Phase 2 users can view only their posts
 class PostListView(LoginRequiredMixin, generic.ListView):
     model = Post
     paginate_by = 5
     context_object_name = "posts"
     # template_name = "blog/post_list.html"
     ordering = ['-created_at']
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Post.objects.filter(user=user)
+        return queryset
 
 
 def post_update(request, pk):
@@ -226,6 +266,7 @@ def post_update(request, pk):
 
 
 # No changes were needed after adding slug, other than reverse url
+# Only created user can update the post
 class PostUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateView):
     model = Post
     form_class = PostModelForm
@@ -249,6 +290,12 @@ class PostUpdateView(LoginRequiredMixin, SuccessMessageMixin, generic.UpdateView
         post.save()
         return super(PostUpdateView, self).form_valid(form)
 
+    def get_object(self, *args, **kwargs):
+        obj = super(PostUpdateView, self).get_object(*args, **kwargs)
+        if obj.user != self.request.user:
+            raise PermissionDenied  # or Http404
+        return obj
+
 
 def post_delete(request, pk):
     post = Post.objects.get(pk=pk)
@@ -267,6 +314,7 @@ def post_delete(request, pk):
 
 # Phase 2, add message. Slug works without changes
 # Phase 3 login
+# Phase 4 Only created user can delete the post
 class PostDeleteView(LoginRequiredMixin, generic.DeleteView):
     """
     DeleteView responds to POST and GET requests, GET request display confirmation template, while POST deletes instance.
@@ -277,13 +325,27 @@ class PostDeleteView(LoginRequiredMixin, generic.DeleteView):
         messages.error(self.request, "Deleted the post successfully!")
         return reverse("blog:post_list")
 
+    def get_object(self, *args, **kwargs):
+        obj = super(PostDeleteView, self).get_object(*args, **kwargs)
+        if obj.user != self.request.user:
+            raise PermissionDenied  # or Http404
+        return obj
+
 
 class CommentDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Comment
 
     def get_success_url(self):
         messages.error(self.request, "Comment deleted successfully!")
+        if self.request.GET.get('redirect') == 'blog':
+            return reverse("blog:blog_detail", kwargs={'slug': self.object.post.slug})
         return reverse("blog:post_detail", kwargs={'slug': self.object.post.slug})
+
+    def get_object(self, *args, **kwargs):
+        obj = super(CommentDeleteView, self).get_object(*args, **kwargs)
+        if obj.user != self.request.user and object.post.user != self.request.user:
+            raise PermissionDenied  # or Http404
+        return obj
 
 
 @login_required(login_url="/login/")
@@ -291,6 +353,8 @@ def comment_approve(request, pk):
     if request.method == "POST":
         # pass the request to the form to validate
         comment = Comment.objects.get(pk=pk)
+        if comment.post.user != request.user:
+            raise PermissionDenied  # or Http404
         comment.approved = True
         comment.save()
         messages.success(request, "Comment approved")

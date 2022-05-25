@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth import get_user_model
 from autoslug import AutoSlugField
+from tinymce import models as tinymce_models
 
 
 User = get_user_model()
@@ -22,7 +23,7 @@ class Post(models.Model):
     post_length = models.CharField(max_length=1, choices=POST_LENGTHS)
     # help_text is for 'help' field in forms
     title = models.CharField(max_length=50)
-    body = models.TextField(help_text='Enter post text here')
+    body = tinymce_models.HTMLField()
     # blank will check if input is an empty string
     # can be null
     # Make slug as index
@@ -35,6 +36,7 @@ class Post(models.Model):
     categories = models.ManyToManyField('Category', related_name='posts', blank=True)
     tags = models.ManyToManyField('Tag', related_name='posts', blank=True,
                                   help_text='Hold down “Control”, or “Command” on a Mac, to select more than one.')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 

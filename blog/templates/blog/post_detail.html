@@ -92,11 +92,6 @@
                 <p>{{ post.updated_at }} {{tz}}</p>
             </dl>
 
-            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-              <a type="button" href="{% url 'blog:post_update' post.slug %}" class="btn btn-primary">Edit</a>
-              <a type="button" href="{% url 'blog:post_delete' post.slug %}" class="btn btn-danger">Delete</a>
-            </div>
-
         </div>
     </div>
 </div>

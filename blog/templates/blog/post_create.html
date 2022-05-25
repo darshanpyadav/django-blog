@@ -3,13 +3,18 @@
 
 {% block title %}Create a post{% endblock %}
 
+{% block extrastyle %}
+<!--TINY MCE script-->
+<script src="https://cdn.tiny.cloud/1/2tldl94oa1ur8m44qvgsus4dfgd6k69cmh33or188eupjtuj/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+{% endblock %}
+
 {% block content %}
 <div class="row">
     <a href="{% url 'blog:post_list' %}" class="link-secondary">Go back to posts</a>
     <div class="row justify-content-center">
         <div class="col-8">
             <h1>Create a new Post</h1>
-            <form method="post" class="uniForm">
+            <form method="post" class="uniForm" novalidate>
                 {% csrf_token %}
                 {{ form | crispy }}
                 <button class="btn btn-success mb-4" type="submit">
@@ -19,4 +24,14 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extrajs %}
+  <script>
+    tinymce.init({
+      selector: 'textarea',
+      plugins: 'advlist autolink lists link charmap preview anchor pagebreak',
+      toolbar_mode: 'floating',
+    });
+  </script>
 {% endblock %}
