@@ -28,16 +28,17 @@ def index_view(request):
 
 
 class BlogListView(generic.ListView):
-    template_name = "blog/index.html"
+    model = Post
+    paginate_by = 2
     context_object_name = "posts"
-
-    def get_queryset(self):
-        return Post.objects.order_by("-created_at")[:5]
+    template_name = "blog/index.html"
+    ordering = ['-created_at']
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         # main_post is the one with most comments in all posts
         # 2 sub posts are the second and third highest
+        print(context_data["posts"])
         context_data.update(
             {
                 "main_post": Post.objects.first,
@@ -63,10 +64,13 @@ class BlogDetailView(generic.DetailView):
         if form.is_valid():
             comment = form.save(commit=False)
             comment.post = self.get_object()
+            if comment.post.user != request.user:
+                messages.warning(request, "Your comment has gone for approval to the post publisher. "
+                                          "It'll be visible once approved!")
+            else:
+                comment.approved = True
             comment.user = request.user
             comment.save()
-            messages.warning(request, "Your comment has gone for approval to the post publisher. "
-                                      "It'll be visible once approved!")
             return redirect("blog:blog_detail", slug=self.get_object().slug)
         else:
             messages.error(request, f'{form.errors}')

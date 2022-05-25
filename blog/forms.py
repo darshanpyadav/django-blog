@@ -43,7 +43,7 @@ class CustomUserCreationForm(UserCreationForm):
         fields = ("username", "email")
         field_classes = {'username': UsernameField}
 
-    email = forms.EmailInput(attrs={'required': 'required'})
+    email = forms.CharField(widget=forms.EmailInput(attrs={'required': 'required'}))
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -81,5 +81,5 @@ class CommentModelForm(forms.ModelForm):
     #     Field('text', rows="3", css_class='form-control mb-3', style='background: #fff;')
     # )
     text = forms.CharField(
-        widget=forms.Textarea(attrs={'class': "form-control", 'rows': 3})
+        widget=forms.Textarea(attrs={'class': "form-control", 'rows': 3, 'cols': 50})
     )
