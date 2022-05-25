@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.template.defaulttags import register
+from django.db.models import Count
 
 
 class SignupView(generic.CreateView):
@@ -37,11 +38,18 @@ class BlogListView(generic.ListView):
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         # main_post is the one with most comments in all posts
+        popular_posts = Comment.objects.values('post_id').\
+            annotate(count=Count('post_id')).\
+            order_by('-count')
+        if popular_posts:
+            popular_post_id = popular_posts[0]["post_id"]
+            main_post = Post.objects.get(pk=popular_post_id)
+        else:
+            main_post = Post.objects.first
         # 2 sub posts are the second and third highest
-        print(context_data["posts"])
         context_data.update(
             {
-                "main_post": Post.objects.first,
+                "main_post": main_post,
                 "sub_posts": Post.objects.order_by("-created_at")[:2]
             })
         return context_data
